@@ -24,6 +24,6 @@ module.exports = class DB{
 				console.log(result);
 				console.log("mi resultado particular: ", result[1].titulo);
 			});
-		};
+		});
 	}
 }
