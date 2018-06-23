@@ -57,15 +57,15 @@ module.exports = class Microbot{
 					this.callSendAPI(response);
 				}
 				*/
-				if( ubicacion && ubicacion.confidence > 0.8){
+				if( ubicacion && ubicacion.confidence > 0.7){
 					this.actionBot('typing');
 					this.callSendAPI({text: "Te estas comunicando desde " + ubicacion.value });
 				}
-				else if(telefono && telefono.confidence > 0.8){
+				else if(telefono && telefono.confidence > 0.7){
 					this.actionBot('typing');
 					this.callSendAPI({text: "tu numero de telefono es "+telefono.value });
 				}
-				else if(intent && intent.confidence > 0.8 && intent.value === "saludo"){
+				else if(intent && intent.confidence > 0.7 && intent.value === "saludo"){
 					this.getName(this.senderId, function(clase, name){
 						let response = {
 							text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti 👍. Desliza para ver nuestras opciones 👆`
@@ -206,22 +206,11 @@ module.exports = class Microbot{
 
 	handlePostback(msg){
 		let payload = msg.payload;
-		if( payload === 'si' ){
-			let response = {
-				text: "Gracias!"
-			}
-		}
-		else if( payload === 'no' ){
-			let response = {
-				text: 'opps, enviame otra imagen'
-			}
-		}
-		else if(  payload === "empezar"){
+		
+		if(  payload === "empezar"){
 			this.getName(this.senderId, function(clase, name){
 				let response = {
-					text: `Hola ${name} bienvenido a MicroTec. 
-📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti. 👍
-Desliza para ver nuestras opciones 👆`
+					text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti. 👍 Desliza para ver nuestras opciones 👆`
 				}
 				let template = clase.templateGeneric();
 				clase.actionBot('typing');
@@ -239,14 +228,15 @@ Desliza para ver nuestras opciones 👆`
 		else if(payload === 'btn_cotizar_3000' || payload === 'btn_cotizar_5000' || payload === 'btn_cotizar_6000'){
 			this.actionBot('typing');
 			let texto = "Tenemos dos opciones para cotizar tu equipo, vía Facebook (un asesor te atenderá por este medio) o vía llamada (un asesor se comunicará contigo por teléfono), por favor selecciona tu preferida";
-			let botones = [this.btnPostback("Vía Facebook", "btn_cambiar_agente_live"), this.btnPostback("Vía llamada", "btn_pedir_numero_telefonico")];
+			let botones = [this.btnPostback("Vía Facebook", "btn_cambiar_agente_live"), this.btnPostback("Vía llamada", "btn_pedir_ubicacion")];
 			this.callSendAPI( this.templateBtn(texto, botones) );
 		}
 		else if(payload === 'btn_cambiar_agente_live'){
 			this.actionBot('typing');
 			this.callSendAPI({text: 'Gracias, en unos momentos un asesor te escribirá'});
+			this.passThreadControl();
 		}
-		else if(payload === 'btn_pedir_numero_telefonico'){
+		else if(payload === 'btn_pedir_ubicacion'){
 			this.actionBot('typing');
 			let response = {
 			    "text": `Que bien que podamos seguir charlando, para continuar por favor, dime de donde te comunicas, o si prefieres, puedes mandar tu ubicación`,
@@ -260,12 +250,12 @@ Desliza para ver nuestras opciones 👆`
 			this.callSendAPI(response);
 		}
 		else{
-			response = {
+			let response = {
 				text: "presionaste un boton de postback con valor " + payload
 			}
+			this.actionBot('typing');
+			this.callSendAPI(response);
 		}
-		this.actionBot('typing');
-		this.callSendAPI(response);
 	}
 
 	btnPostback( titulo, payload ){
@@ -647,6 +637,36 @@ Desliza para ver nuestras opciones 👆`
 	}
 
 	
+	passThreadControl(){
+	/*	curl -X POST -H "Content-Type: application/json" -d '{
+	  "recipient":{"id":"<PSID>"},
+	  "target_app_id":123456789,
+	  "metadata":"String to pass to secondary receiver app" 
+	}' "https://graph.facebook.com/v2.6/me/pass_thread_control?access_token=<PAGE_ACCESS_TOKEN>"
+	*/
+
+		let info = {
+			recipient: {
+				id: this.senderId
+			},
+			target_app_id: 263902037430900,
+			metadata: "El usuario a decidio hablar con un Agente en linea"
+		}
+		request({
+			"uri": "https://graph.facebook.com/v2.6/me/pass_thread_control",
+		    "qs": { "access_token": this.APP_TOKEN },
+		    "method": "POST",
+		    "json": info
+		}, (err, res, body) => {
+			if (!err) {
+		    	console.log('¡Mensaje enviado!')
+		    }
+		    else {
+		    	console.error("Imposible enviar mensaje:" + err);
+		    }
+		});
+
+	}
 
 
 

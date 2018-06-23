@@ -1,7 +1,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var Microbot = require('./Microbot.js');
-var geoip = require('geoip-lite');
 
 var app = express();
 app.use(bodyParser.json());
@@ -28,17 +27,39 @@ app.post('/webhook', function(req, res){
 	let data = req.body;
 	if( data.object === 'page' ){
 		data.entry.forEach( function(pageEntry) {
-			let webhook_event = pageEntry.messaging[0];
-			let senderId = webhook_event.sender.id;
+			
+			//bot como receptor principal
+			if( pageEntry.messaging ){
+				let webhook_event = pageEntry.messaging[0];
+				let senderId = webhook_event.sender.id;
 
-			var Bot = new Microbot(senderId);
+				var Bot = new Microbot(senderId);
 
-			if( webhook_event.message ){
-				Bot.handleMessage(webhook_event.message);
+				if( webhook_event.message ){
+					Bot.handleMessage(webhook_event.message);
+				}
+				else if( webhook_event.postback ){
+					Bot.handlePostback(webhook_event.postback);
+				}
 			}
-			else if( webhook_event.postback ){
-				Bot.handlePostback(webhook_event.postback);
+
+			//escuchando como receptor secundario
+			if ( pageEntry.standby) {
+				// iterate webhook events from standby channel
+				pageEntry.standby.forEach(event => {
+					const psid = event.sender.id;
+					if( event.message ){
+						const message = event.message;
+					}
+					else if( event.postback ){
+						const message = event.postback;
+					}
+					
+				});
+				console.log("evento standy recibido");
 			}
+
+
 		});
 		res.status(200).send("Evento_Recibido");
 	}
