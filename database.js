@@ -6,24 +6,33 @@ module.exports = class DB{
 			host: 'localhost',
 			user: 'root',
 			password: '',
-			database: 'test'
-		});	
+			database: 'botv2'
+		});
 	}
 	//querys tipo insert,update, delete
-	setQuery(sql, data){
-		//falta declararlo
+	setQuery(type, sql, data){
+		//si vamos a insertar primero hacemos un select, de ahi si es 0 resultados, hacemos un insert si hay resultados hacemos un update
+		
 	}
 	//querys select
-	getQuery(sql, data){
+	getQuery(sql, callback){
 		this.conn.connect( err => {
 			if(err) throw err;
 			console.log('conectado');
-
-			this.conn.query("SELECT * FROM promos", (err, result, fields) => {
+			this.conn.query(sql, (err, result, fields) => {
 				if(err) throw err;
-				console.log(result);
-				console.log("mi resultado particular: ", result[1].titulo);
+				callback(result);
 			});
 		});
 	}
 }
+
+/*
+create database botv2;
+use botv2;
+create table locationuser(
+	psid varchar(30) not null unique,
+    ubicacion varchar(100) not null,
+    tiempo varchar(30) default 0
+)ENGINE=INNODB, charset=utf8;
+*/

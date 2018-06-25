@@ -1,4 +1,13 @@
 var request = require("request");
+var DB = require("./database.js");
+
+var base = new DB();
+
+base.start();
+base.getQuery("select * from locationuser", function(datos){
+	console.log(datos);
+});
+
 
 const APP_TOKEN = "EAAW1N706mu0BABLBlDunN5YFWeq6mNHVXywPiZBQitdBNI3VTj5KvF82yI3THBsLCS9ZCAvaGNac5zsc6yff71ZAkAZCpQWRZAWMcf16ZArwPewq8vmfyoVm7z4ZApGEtwc6CGr81ix657tdzq9lHyofZCHPHnzZCPav0YXPgi7ZBChHZAC8gqCsV7P";
 
@@ -156,6 +165,7 @@ request({
 
 
 //propiedades de messenger
+/*
 request({
 	uri: 'https://graph.facebook.com/v2.6/me/messenger_profile',
 	qs: {
@@ -176,6 +186,7 @@ request({
 	}
 
 });
+*/
 
 
 /*
@@ -295,15 +306,21 @@ request({
 
 });*/
 
+
+
+
+//esta peticion retorna informacion de la ubicacion con proporcionar el nombre
 /*
 request({
-	uri: 'https://maps.googleapis.com/maps/api/geocode/json',
+	uri: "https://maps.googleapis.com/maps/api/geocode/json",
+//	uri: 'https://maps.googleapis.com/maps/api/geocode/json',
 	qs: {
-		latlng: "20.065303,-97.067536", 
+		address: "cholula",
+		//latlng: "20.065303,-97.067536",
 		key: "AIzaSyB8UTMBAxOYzocL4dewFSlBaEKeqJ26O3o",
-		result_type: "political|country|locality"
+		//result_type: "political|country|locality"
 	},
-	method: 'POST'
+	method: 'GET'
 }, function(err, response, data){
 
 	if(err){
@@ -311,7 +328,6 @@ request({
 	}
 	else{
 		data = JSON.parse(data);
-		console.log(data['status']);
 		console.log(data['results'])
 		//console.log(data.results[0].formatted_address)
 		//data.results.forEach( function(obj) {
@@ -321,4 +337,4 @@ request({
 	}
 
 });
-	*/
+*/
