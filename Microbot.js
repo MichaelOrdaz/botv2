@@ -58,11 +58,21 @@ module.exports = class Microbot{
 					});
 				}
 				else if(telefono && telefono.confidence > 0.7){
-					this.actionBot('typing');
-					let texto = "Para confirmar, ¿Es este tu número de telefono? *" + telefono.value+"*";
-					let btns = [this.btnPostback('Si, asi es', 'btn_confirma_telefono'), this.btnPostback('No', 'btn_pedir_numero')];
-					let template = this.templateBtn(texto, btns);
-					this.callSendAPI(template);
+					let cleanNum = telefono.value.replace(/[\s-\/]/g, "");
+					if(cleanNum.length < 10){
+						let response = {text: "Lo siento, pero tu número no es valido, por favor vuelve a ingresarlo y recuerda que debe ser a 10 digitos por fa"};
+						this.actionBot('typing');
+						this.callSendAPI(response);
+					}
+					else{
+						let texto = "Para confirmar, ¿Es este tu número de telefono? *" + telefono.value+"*";
+						let btns = [this.btnPostback('Si, asi es', 'btn_confirma_telefono'), this.btnPostback('No', 'btn_pedir_numero')];
+						let template = this.templateBtn(texto, btns);
+						this.actionBot('typing');
+						this.callSendAPI(template);
+					}
+					
+				
 				}
 				else if(intent && intent.confidence > 0.7 && intent.value === "saludo"){
 					this.getName(this.senderId, function(clase, name){
