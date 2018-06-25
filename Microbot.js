@@ -33,32 +33,7 @@ module.exports = class Microbot{
 				let ubicacion = this.firstEntity(msg.nlp, 'location');
 				let telefono = this.firstEntity(msg.nlp, 'phone_number');
 				let intent = this.firstEntity(msg.nlp, 'intent');
-
-				/*if( msg.text === 'respuestas rapidas' ){
-					response = {
-					    "text": `Estas son respuestas rapidas que son botones flotantes que se sobreponen sobre todo y una vez seleccionado, desaparecen, soportan texto, lugar(ubicacion), numero de telefono y correo electronico`,
-					    "quick_replies":[
-					      {
-					        "content_type":"text",
-					        "title":"Buscar",
-					        "payload":"valor dado por el desarrollador",
-					        "image_url":"https://image.flaticon.com/icons/png/512/14/14562.png"
-					      },
-					      {
-					        "content_type":"location"
-					      },
-					      {
-					      	"content_type": "user_phone_number"
-					      },
-					      {
-					      	"content_type": "user_email"
-					      }
-					    ]
-					  }
-					this.actionBot('typing');
-					this.callSendAPI(response);
-				}
-				*/
+				
 				if( ubicacion && ubicacion.confidence > 0.7){
 
 					this.findLocation("address", ubicacion.value, undefined, function(that, lugar){
@@ -81,43 +56,23 @@ module.exports = class Microbot{
 						let template = that.templateGeneric(elementos);
 						that.callSendAPI(template);
 					});
-
-					//this.actionBot('typing');
-					/*
-						aqui debo de enviar el mapa estatico, con dos botones de postback preguntando si esa es la ubicacion o no,
-						si es cierto, compruebo que tenga disponibilidad,
-						si es falso, buelvo a pedir ciudad.
-
-						teniendo en cuanta que me mando una ubicacion va entrar en este condicion, si no me proporciona ninguna direccion pues que lo deje en visto.
-					*/
-
 				}
 				else if(telefono && telefono.confidence > 0.7){
 					this.actionBot('typing');
-					
 					let texto = "Para confirmar, ¿Es este tu número de telefono? *" + telefono.value+"*";
 					let btns = [this.btnPostback('Si, asi es', 'btn_confirma_telefono'), this.btnPostback('No', 'btn_pedir_numero')];
 					let template = this.templateBtn(texto, btns);
 					this.callSendAPI(template);
-
 				}
 				else if(intent && intent.confidence > 0.7 && intent.value === "saludo"){
 					this.getName(this.senderId, function(clase, name){
 						let response = {
 							text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti 👍. Desliza para ver nuestras opciones 👆`
 						}
-
 						let elementos = [
 						{
 							"title":"Contrata o renueva tu plan tarifario y llévate un Smartphone desde $199 al mes",
 							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							//"subtitle":"",
-							/*"default_action": {
-								"type": "web_url",
-								"url": "https://www.micro-tec.com.mx/pagina/microtec",
-								//"messenger_extensions": <TRUE | FALSE>,
-								//"webview_height_ratio": "<COMPACT | TALL | FULL>"
-							},*/
 							"buttons":[
 								clase.btnPostback("Promos al Contratar", "btn_promo_contratar"),
 								clase.btnPostback("Promos al Renovar", "btn_promo_renovar")
@@ -171,50 +126,8 @@ module.exports = class Microbot{
 						clase.callSendAPI(template);
 					});
 				}
-				else if(msg.text === 'generica'){
-
-					this.actionBot('typing');
-					this.callSendAPI({text: 'La plantilla genérica es un mensaje estructurado sencillo que incluye un título, un subtítulo, una imagen y hasta tres botones, tambien se pueden colocar hasta 10 plantillas, que se deslizan horizontalmente'});
-					//this.actionBot('typing');
-					let asd = this.templateGeneric();
-					this.callSendAPI( asd );
-
-				}
-				else if(msg.text === 'lista'){
-					this.actionBot('typing');
-					this.callSendAPI({text: "La plantilla de lista es una lista de dos a cuatro elementos estructurados con un botón global opcional que aparece en la parte inferior. Cada elemento puede contener una imagen en miniatura, un título, un subtítulo y un botón. "});
-					let tmp = this.templateList();
-					this.callSendAPI( tmp );
-				}
-				else if(msg.text === 'botones'){
-					this.actionBot('typing');
-					this.callSendAPI( this.templateBtn() );
-				}
-				else if(msg.text === 'imagen'){
-					this.actionBot('typing');
-					let res = this.templateMedia('image', '774855082721945');
-					this.callSendAPI(res);
-				}
-				else if(msg.text === 'gif'){
-					this.actionBot('typing');
-					let res = this.templateMedia('video', '774823049391815');
-					this.callSendAPI(res);
-				}
-				else if(msg.text === 'video'){
-					this.actionBot('typing');
-					let res = this.templateMedia('video', '774869036053883');
-					this.callSendAPI(res);
-				}
-
-				else if(msg.text === 'nada'){
-					this.actionBot('mark_seen');
-				}
 				else{
-					response = {
-						text: `el mensaje que recibi es: "${msg.text}". ¡ahora enviame una imagen!`
-					};
-					this.actionBot('typing');
-					this.callSendAPI(response);
+					this.actionBot('mark_seen');
 				}
 			}
 			
@@ -253,7 +166,8 @@ module.exports = class Microbot{
 
 			}
 			else{
-
+				//cuando reciba adjunto lo dejare en visto
+				/*
 				let attachments_urls = [];
 				msg.attachments.forEach( item => {
 					attachments_urls.push( item.payload.url );
@@ -266,7 +180,7 @@ module.exports = class Microbot{
 							template_type: "generic",
 							elements: [
 								{
-									title: "esta es tu primer imagen ?",
+									title: "¿Por que me enviaste una imagen?",
 									subtitle: "presiona el boton de respuesta",
 									image_url: attachments_urls[0],
 									buttons: [
@@ -280,39 +194,12 @@ module.exports = class Microbot{
 				}
 				this.actionBot('typing');
 				this.callSendAPI(response);
+				*/
+				this.actionBot('mark_seen');
 
 			}
 		}
 
-	}
-
-	getName(psid, callback){
-		let clase = this;
-		request({
-			uri: 'https://graph.facebook.com/v2.6/'+psid,
-			qs: {
-				access_token: this.APP_TOKEN,
-				fields: "first_name"
-			},
-			method: 'GET'
-			}, function(err, response, data){
-			if(err){
-				console.log("Error al enviar")
-			}
-			else{
-				let name = "";
-				if ( data.length > 3 ){
-					data = JSON.parse(data);
-					name = data.first_name;
-					callback(clase, name);
-				}
-				else{
-					name = "no"
-					callback(clase, name);
-				}
-
-			}
-		});
 	}
 
 	handlePostback(msg){
@@ -608,12 +495,127 @@ module.exports = class Microbot{
 			this.callSendAPI(template);
 			this.callSendAPI(menu);
 		}
+		else if(payload === 'btn_promo_contado'){
+			let btn = this.btnPostback('Cotizar', 'btn_cotizar_promo_contado');
+			let elementos = [
+				{
+        			"title": "$1,999 tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "$999 tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "$599 tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		}
+			];
+			let template = this.templateList(elementos);
+			this.actionBot('typing');
+			this.callSendAPI(template);
+		}
+		else if(payload === 'btn_cotizar_promo_contado'){
+			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
+			let template = this.templateBtn(texto, boton);
+
+			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
+			
+			this.actionBot('typing');
+			this.callSendAPI(template);
+			this.callSendAPI(menu);
+		}
+		else if(payload === 'btn_promo_apartado'){
+			let btn = this.btnPostback('Cotizar', 'btn_cotizar_promo_apartado');
+			let elementos = [
+				{
+        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
+        			//"subtitle": "subtitulo con 80 caracteres",
+        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"buttons": [
+        				btn
+        			]
+        		}
+			];
+			let template = this.templateList(elementos);
+			this.actionBot('typing');
+			this.callSendAPI(template);
+		}
+		else if(payload === 'btn_cotizar_promo_apartado'){
+			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Apártalo con $50 pesos o más y termínalo de pagar hasta en 3 meses. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
+			let template = this.templateBtn(texto, boton);
+
+			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
+			
+			this.actionBot('typing');
+			this.callSendAPI(template);
+			this.callSendAPI(menu);
+		}
 		else{
 			let response = {
 				text: "presionaste un boton de postback con valor " + payload
 			}
 			this.callSendAPI(response);
 		}
+	}
+
+	getName(psid, callback){
+		let clase = this;
+		request({
+			uri: 'https://graph.facebook.com/v2.6/'+psid,
+			qs: {
+				access_token: this.APP_TOKEN,
+				fields: "first_name"
+			},
+			method: 'GET'
+			}, function(err, response, data){
+			if(err){
+				console.log("Error al enviar")
+			}
+			else{
+				let name = "";
+				if ( data.length > 3 ){
+					data = JSON.parse(data);
+					name = data.first_name;
+					callback(clase, name);
+				}
+				else{
+					name = "no"
+					callback(clase, name);
+				}
+
+			}
+		});
 	}
 
 	btnPostback( titulo, payload ){
