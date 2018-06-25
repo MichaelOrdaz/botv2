@@ -215,13 +215,6 @@ module.exports = class Microbot{
 					{
 						"title":"Contrata o renueva tu plan tarifario y llévate un Smartphone desde $199 al mes",
 						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-						//"subtitle":"",
-						/*"default_action": {
-							"type": "web_url",
-							"url": "https://www.micro-tec.com.mx/pagina/microtec",
-							//"messenger_extensions": <TRUE | FALSE>,
-							//"webview_height_ratio": "<COMPACT | TALL | FULL>"
-						},*/
 						"buttons":[
 							clase.btnPostback("Promos al Contratar", "btn_promo_contratar"),
 							clase.btnPostback("Promos al Renovar", "btn_promo_renovar")
@@ -581,11 +574,57 @@ module.exports = class Microbot{
 			this.callSendAPI(template);
 			this.callSendAPI(menu);
 		}
+		else if (payload === 'btn_internet_199') {
+			let texto = `En Microtec podrás encontrar el nuevo internet en casa, que te ofrece internet ilimitado con renta mensual de $199 y velocidad de 5 Mbps.
+- ubicas el lugar donde va estar 
+- conectas el modem a la corriente 
+- y disfruta de internet ilimitado en tus dispositivos 
+Encuentra tu tienda más cercana para realizar el trámite, solo con una identificación oficial vigente y un comprobante de domicilio.  
+Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
+			let template = this.templateBtn(texto, boton);
+
+			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
+			
+			this.actionBot('typing');
+			this.callSendAPI(template);
+			this.callSendAPI(menu);
+		}
+		else if (payload === 'btn_internet_349') {
+			let texto = `En Microtec podrás encontrar el nuevo internet en casa, que te ofrece internet ilimitado con renta mensual de $349 y velocidad de 10 Mbps. 
+- ubicas el lugar donde va estar 
+- conectas el modem a la corriente 
+- y disfruta de internet ilimitado en tus dispositivos 
+Encuentra tu tienda más cercana para realizar el trámite, solo con una identificación oficial vigente y un comprobante de domicilio. 
+Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
+			let template = this.templateBtn(texto, boton);
+
+			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
+			
+			this.actionBot('typing');
+			this.callSendAPI(template);
+			this.callSendAPI(menu);
+		}
+		else if( payload === 'btn_ubica_sucursal' ){
+			let texto = `Encuentra tu tienda más cercana contamos con gran variedad de equipos y modelos, además tenemos los accesorios que tu necesitas para tu celular, recarga tiempo aire y paga tus servicios. Ubicar tu tienda, contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
+			let template = this.templateBtn(texto, boton);
+
+			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
+			
+			this.actionBot('typing');
+			this.callSendAPI(template);
+			this.callSendAPI(menu);
+		}
+		else if( payload === 'btn_agente_live' ){
+			let texto = `Excelente con gusto podemos ayudarte, dinos ¿Cuál es tu duda? o ¿Qué servicio buscas? Y en breve uno de nuestros asesores te contestará`;
+			this.actionBot('typing');
+			this.callSendAPI({text: texto});
+			this.passThreadControl();
+		}
 		else{
-			let response = {
-				text: "presionaste un boton de postback con valor " + payload
-			}
-			this.callSendAPI(response);
+			this.actionBot('mark_seen');
 		}
 	}
 
