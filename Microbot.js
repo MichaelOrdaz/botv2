@@ -35,7 +35,8 @@ module.exports = class Microbot{
 				let intent = this.firstEntity(msg.nlp, 'intent');
 				
 				if( ubicacion && ubicacion.confidence > 0.7){
-
+					//this.callSendAPI({text: "escribiste: " + ubicacion.value});
+					
 					this.findLocation("address", ubicacion.value, undefined, function(that, lugar){
 						//con esta obtenemos una url de la ubicacion de mapa de google maps
 						let mapa = that.staticMap(ubicacion.value);
@@ -46,7 +47,7 @@ module.exports = class Microbot{
 								"subtitle": "Ciudad " + lugar.city + ", Estado " + lugar.state,
 								"buttons":[
 									that.btnPostback("Exacto, ¡aqui vivo!", "btn_verificar_disponibilidad&"+JSON.stringify(lugar) ),
-									that.btnPostback("No, estas mal", "btn_pedir_ubicacion_otra_vez")
+									that.btnPostback("Poner otra ubicación", "btn_pedir_ubicacion_otra_vez")
 								]
 							}//endTemplate
 						];
@@ -56,6 +57,7 @@ module.exports = class Microbot{
 						let template = that.templateGeneric(elementos);
 						that.callSendAPI(template);
 					});
+					
 				}
 				else if(telefono && telefono.confidence > 0.7){
 					let cleanNum = telefono.value.replace(/[\s-\/]/g, "");
@@ -65,8 +67,8 @@ module.exports = class Microbot{
 						this.callSendAPI(response);
 					}
 					else{
-						let texto = "Para confirmar, ¿Es este tu número de telefono? *" + telefono.value+"*";
-						let btns = [this.btnPostback('Si, asi es', 'btn_confirma_telefono'), this.btnPostback('No', 'btn_pedir_numero')];
+						let texto = "Para confirmar, ¿Es este tu número de teléfono? *" + telefono.value+"*";
+						let btns = [this.btnPostback('Si, es correcto', 'btn_confirma_telefono'), this.btnPostback('No', 'btn_pedir_numero')];
 						let template = this.templateBtn(texto, btns);
 						this.actionBot('typing');
 						this.callSendAPI(template);
@@ -77,58 +79,62 @@ module.exports = class Microbot{
 				else if(intent && intent.confidence > 0.7 && intent.value === "saludo"){
 					this.getName(this.senderId, function(clase, name){
 						let response = {
-							text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti 👍. Desliza para ver nuestras opciones 👆`
+							text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti 👍. Desliza para ver nuestras opciones 👉`
 						}
 						let elementos = [
-						{
-							"title":"Contrata o renueva tu plan tarifario y llévate un Smartphone desde $199 al mes",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"buttons":[
-								clase.btnPostback("Promos al Contratar", "btn_promo_contratar"),
-								clase.btnPostback("Promos al Renovar", "btn_promo_renovar")
-							]
-						},//endTemplate
-						{
-							"title":"Estrena celular a crédito pagando desde 15% de enganche y los demás a 12 meses",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"buttons":[
-								clase.btnPostback("Tarjeta Amigo Fácil", "btn_taf"),
-								clase.btnPostback("Crédito con Facebook", "btn_credito_face")
-							]
-						},//endTemplate
-						{
-							"title":"Llevarte tu celular de contado con las mejores promos o apártalo con $50 pesos",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"buttons":[
-								clase.btnPostback("Promoción al Contado", "btn_promo_contado"),
-								clase.btnPostback("Promoción Apartado", "btn_promo_apartado")
-							]
-						},//endTemplate
-						{
-							"title":"Nuevo internet en casa telcel (internet ilimitado desde $199 mensuales)",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"subtitle":"Internet $199/mes con 5 Mbps, Internet $349/mes con 10 Mbps",
-							"buttons":[
-								clase.btnPostback("paquete $199", "btn_internet_199"),
-								clase.btnPostback("paquete $349", "btn_internet_349")
-							]
-						},//endTemplate
-						{
-							"title":"Visita Nuestras tiendas MicroTec donde seguro estrenas",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"subtitle":"Ve a nuestra pagina de internet para localizar nuestras sucursales Microtec",
-							"buttons":[
-								clase.btnPostback("¡Ubica tu sucursal!", "btn_ubica_sucursal")
-							]
-						},//endTemplate
-						{
-							"title":"¿No encontrate lo que deseabas? Habla con uno de nuestros asesores",
-							"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-							"buttons":[
-								clase.btnPostback("Agente en vivo", "btn_agente_live")
-							]
-						}
-					]//endElements
+							{
+								"title":"Llévate un Smartphone incluido al Renovar o Contratar un plan",
+								"subtitle": "En MicroTec tenemos planes desde $199 mensuales",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot4.jpg",
+								"buttons":[
+									clase.btnPostback("Equipos al Contratar", "btn_promo_contratar"),
+									clase.btnPostback("Equipos al Renovar", "btn_promo_renovar")
+								]
+							},//endTemplate
+							{
+								"title":"Estrena el celular de tus sueños en cómodas mensualidades",
+								"subtitle": "Paga desde el 15% de enganche y los demás a 12 meses",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot3.jpg",
+								"buttons":[
+									clase.btnPostback("Tarjeta Amigo Fácil", "btn_taf"),
+									clase.btnPostback("Crédito con Facebook", "btn_credito_face")
+								]
+							},//endTemplate
+							{
+								"title":"Tenemos gran variedad de marcas y modelos",
+								"subtitle": "Promociones exclusivas solo en MicroTec",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot1.jpg",
+								"buttons":[
+									clase.btnPostback("Equipos de Contado", "btn_promo_contado"),
+									clase.btnPostback("Equipos Apartado", "btn_promo_apartado")
+								]
+							},//endTemplate
+							{
+								"title":"Nuevo internet ilimitado en casa",
+								"subtitle": "Ubica, Conecta y disfruta desde $199 al mes",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot2.jpg",
+								"buttons":[
+									clase.btnPostback("Plan de $199", "btn_internet_199"),
+									clase.btnPostback("Plan de $349", "btn_internet_349")
+								]
+							},//endTemplate
+							{
+								"title":"Visita Nuestras tiendas MicroTec donde seguro estrenas",
+								"subtitle": "Puebla, Veracruz, Tlaxcala y Oaxaca",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot6.jpg",
+								"buttons":[
+									clase.btnPostback("Ubica tu sucursal", "btn_ubica_sucursal")
+								]
+							},//endTemplate
+							{
+								"title":"¿No encontrate lo que deseabas?",
+								"subtitle": "Habla con uno de nuestros asesores",
+								"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot5.jpg",
+								"buttons":[
+									clase.btnPostback("Chatea con un asesor", "btn_agente_live")
+								]
+							}
+						]//endElements
 
 						let template = clase.templateGeneric( elementos );
 						clase.actionBot('typing');
@@ -155,12 +161,12 @@ module.exports = class Microbot{
 					let flag = estados.includes( that.transformString( lugar.state ) );
 					if( !flag ){
 						response = {
-							text: "Aunque me gustaría atenderte, lo siento Microtec no tiene cobertura en tu ciudad 😔, y asi seria dificil poder atenderte"
+							text: "Aunque nos gustaría atenderte, Microtec no tiene cobertura en tu ciudad 😔, te recomendamos acudir a Telcel de tu cuidad, gracias 👍"
 						}
 					}
 					else{
 						response = {
-							text: "Excelente, ahora podrias brindarme un numero de teléfono para poder comunicarnos contigo",
+							text: "Excelente, ahora podrias brindarme un número teléfonico a 10 dígitos para poder comunicarnos contigo 📲",
 							"quick_replies":[
 								{
 									"content_type": "user_phone_number"
@@ -218,56 +224,60 @@ module.exports = class Microbot{
 		if(  payload === "empezar"){
 			this.getName(this.senderId, function(clase, name){
 				let response = {
-					text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti. 👍 Desliza para ver nuestras opciones 👆`
+					text: `Hola ${name} bienvenido a MicroTec. 📱 Descubre nuestras diferentes formas de estrenar tu nuevo celular y promociones que tenemos para ti. 👍 Desliza para ver nuestras opciones 👉`
 				}
 				
 				let elementos = [
 					{
-						"title":"Contrata o renueva tu plan tarifario y llévate un Smartphone desde $199 al mes",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+						"title":"Llévate un Smartphone incluido al Renovar o Contratar un plan",
+						"subtitle": "En MicroTec tenemos planes desde $199 mensuales",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot4.jpg",
 						"buttons":[
-							clase.btnPostback("Promos al Contratar", "btn_promo_contratar"),
-							clase.btnPostback("Promos al Renovar", "btn_promo_renovar")
+							clase.btnPostback("Equipos al Contratar", "btn_promo_contratar"),
+							clase.btnPostback("Equipos al Renovar", "btn_promo_renovar")
 						]
 					},//endTemplate
 					{
-						"title":"Estrena celular a crédito pagando desde 15% de enganche y los demás a 12 meses",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+						"title":"Estrena el celular de tus sueños en cómodas mensualidades",
+						"subtitle": "Paga desde el 15% de enganche y los demás a 12 meses",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot3.jpg",
 						"buttons":[
 							clase.btnPostback("Tarjeta Amigo Fácil", "btn_taf"),
 							clase.btnPostback("Crédito con Facebook", "btn_credito_face")
 						]
 					},//endTemplate
 					{
-						"title":"Llevarte tu celular de contado con las mejores promos o apártalo con $50 pesos",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+						"title":"Tenemos gran variedad de marcas y modelos",
+						"subtitle": "Promociones exclusivas solo en MicroTec",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot1.jpg",
 						"buttons":[
-							clase.btnPostback("Promoción al Contado", "btn_promo_contado"),
-							clase.btnPostback("Promoción Apartado", "btn_promo_apartado")
+							clase.btnPostback("Equipos de Contado", "btn_promo_contado"),
+							clase.btnPostback("Equipos Apartado", "btn_promo_apartado")
 						]
 					},//endTemplate
 					{
-						"title":"Nuevo internet en casa telcel (internet ilimitado desde $199 mensuales)",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-						"subtitle":"Internet $199/mes con 5 Mbps, Internet $349/mes con 10 Mbps",
+						"title":"Nuevo internet ilimitado en casa",
+						"subtitle": "Ubica, Conecta y disfruta desde $199 al mes",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot2.jpg",
 						"buttons":[
-							clase.btnPostback("paquete $199", "btn_internet_199"),
-							clase.btnPostback("paquete $349", "btn_internet_349")
+							clase.btnPostback("Plan de $199", "btn_internet_199"),
+							clase.btnPostback("Plan de $349", "btn_internet_349")
 						]
 					},//endTemplate
 					{
 						"title":"Visita Nuestras tiendas MicroTec donde seguro estrenas",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-						"subtitle":"Ve a nuestra pagina de internet para localizar nuestras sucursales Microtec",
+						"subtitle": "Puebla, Veracruz, Tlaxcala y Oaxaca",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot6.jpg",
 						"buttons":[
-							clase.btnPostback("¡Ubica tu sucursal!", "btn_ubica_sucursal")
+							clase.btnPostback("Ubica tu sucursal", "btn_ubica_sucursal")
 						]
 					},//endTemplate
 					{
-						"title":"¿No encontrate lo que deseabas? Habla con uno de nuestros asesores",
-						"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+						"title":"¿No encontrate lo que deseabas?",
+						"subtitle": "Habla con uno de nuestros asesores",
+						"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/bot5.jpg",
 						"buttons":[
-							clase.btnPostback("Agente en vivo", "btn_agente_live")
+							clase.btnPostback("Chatea con un asesor", "btn_agente_live")
 						]
 					}
 				]//endElements
@@ -283,22 +293,25 @@ module.exports = class Microbot{
 			this.actionBot('typing');
 			let elementos = [
 				{
-					"title":"Incluye 3000mb para navegar + Redes Sociales + llamadas/mensajes ilimitados + 📱",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Contrata un Plan de $399 al mes y llévate",
+					"subtitle": "3000 Mb + Redes Sociales + llamadas + mensajes sin límite + smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan2.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_3000")
 					]
 				},//endTemplate
 				{
-					"title":"Incluye 5000mb para navegar + Redes Sociales + llamadas/mensajes ilimitados + 📱",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Contrata un Plan de $499 al mes y llévate",
+					"subtitle": "5000 Mb + Redes Sociales + llamadas + mensajes sin límite + smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan7.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_5000")
 					]
 				},//endTemplate
 				{
-					"title":"Incluye 6000mb para navegar + Redes Sociales + llamadas/mensajes ilimitados + 📱",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Contrata un Plan de $599 al mes y llévate",
+					"subtitle": "6000 Mb + Redes Sociales + llamadas + mensajes sin límite + smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan16.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_6000")
 					]
@@ -311,19 +324,22 @@ module.exports = class Microbot{
 		}
 		else if(payload === 'btn_cotizar_3000' || payload === 'btn_cotizar_5000' || payload === 'btn_cotizar_6000' || payload === 'btn_cotizar_7000' || payload === 'btn_cotizar_8000' || payload === 'btn_cotizar_9000'){
 			this.actionBot('typing');
-			let texto = "Tenemos dos opciones para cotizar tu equipo, vía Facebook (un asesor te atenderá por este medio) o vía llamada (un asesor se comunicará contigo por teléfono), por favor selecciona tu preferida";
+			let texto = `Contamos con dos opciones para cotizar tu Plan, 
+💻 Vía Facebook _un asesor te atenderá por este medio_ o 
+📞 Vía llamada _un asesor se comunicará contigo por teléfono_, 
+Por favor selecciona la opción de tu preferencia`;
 			let botones = [this.btnPostback("Vía Facebook", "btn_cambiar_agente_live"), this.btnPostback("Vía llamada", "btn_pedir_ubicacion")];
 			this.callSendAPI( this.templateBtn(texto, botones) );
 		}
 		else if(payload === 'btn_cambiar_agente_live'){
 			this.actionBot('typing');
-			this.callSendAPI({text: 'Gracias, en unos momentos un asesor te escribirá'});
+			this.callSendAPI({text: 'Gracias, uno de nuestros asesores te atenderá lo antes posible (horarios de atención de Lunes a Viernes de 11 am – 7 pm. Sábados de 11 am a 2 pm)'});
 			this.passThreadControl();
 		}
 		else if(payload === 'btn_pedir_ubicacion'){
 			this.actionBot('typing');
 			let response = {
-			    "text": `Que bien que podamos seguir charlando, para continuar por favor, dime de donde te comunicas, o si prefieres, puedes mandarme tu ubicación`,
+			    "text": `Gracias, para continuar por favor, dime de donde te comunicas, o si prefieres, puedes mandarme tu ubicación 📍`,
 			    "quick_replies":[
 			      {
 			        "content_type":"location"
@@ -336,7 +352,7 @@ module.exports = class Microbot{
 		else if( payload === "btn_pedir_ubicacion_otra_vez" ){
 			this.actionBot('typing');
 			let response = {
-			    "text": `Lo siento, para poder brindarme un mejor servicio, no seas malo, escribe tu ubicación más especifica, o comparteme tu ubicación`,
+			    "text": `Lo siento, podrias escribir tu ubicación o si lo prefieres envia tu ubicación 👇`,
 			    "quick_replies":[
 			      {
 			        "content_type":"location"
@@ -363,7 +379,7 @@ module.exports = class Microbot{
 			}
 			else{
 				response = {
-					text: "Excelente, ahora podrias brindarme un numero de teléfono para poder comunicarnos contigo",
+					text: "Excelente, ahora podrias brindarme un número telefónico a 10 dígitos para poder comunicarnos contigo 📲",
 					"quick_replies":[
 						{
 							"content_type": "user_phone_number"
@@ -379,7 +395,7 @@ module.exports = class Microbot{
 		}
 		else if(payload === 'btn_pedir_numero'){
 			let response = {
-				text: "Excelente, por favor escribeme un número para que un agente pueda comunicarse contigo homs",
+				text: "Excelente, por favor escribeme un número para que un agente pueda comunicarse contigo lo antes posible ☎",
 				"quick_replies":[
 					{
 						"content_type": "user_phone_number"
@@ -391,45 +407,34 @@ module.exports = class Microbot{
 		}
 		else if( payload === 'btn_confirma_telefono' ){
 			this.actionBot('typing');
-			let template = this.templateBtn("Gracias amigo, en el transcurso del día uno de nuestros agentes se comunicara contigo, si quieres seguir explorando regresa al menu principal", [this.btnPostback('Menu', 'empezar')]);
+			let template = this.templateBtn("Gracias amigo, en el transcurso del día uno de nuestros agentes se comunicará contigo, si quieres seguir explorando regresa al menu principal ✅", [this.btnPostback('Menu', 'empezar')]);
 			this.callSendAPI(template);
 		}
 		else if(payload === 'btn_promo_renovar'){
 			this.actionBot('typing');
 			let elementos = [
 				{
-					"title":"Incluye 5000mb para navegar + Redes sociales, llamadas/msj sin limite + Equipo",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Renueva con un Plan Platino 7000 y recibe $200 de descuento Total $599 al mes",
+					"subtitle": "10000 Mb + Redes Sociales + llamadas + mensajes sin límite + Smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan1.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_3000")
 					]
 				},//endTemplate
 				{
-					"title":"Incluye 6000mb para navegar + Redes sociales, llamadas/msj sin limite + Equipo",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Renueva con un Plan Platino 8000 y recibe $200 de descuento Total $699 al mes",
+					"subtitle": "11000 Mb + Redes Sociales + llamadas + mensajes sin límite + Smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan9.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_6000")
 					]
 				},//endTemplate
 				{
-					"title":"Incluye 7000mb para navegar + Redes sociales, llamadas/msj sin limite + Equipo",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+					"title":"Renueva con un Plan Platino 9000 y recibe $200 de descuento Total $799 al mes",
+					"subtitle": "13000 Mb + Redes Sociales + llamadas + mensajes sin límite + Smartphone",
+					"image_url":"https://www.micro-tec.com.mx/pagina/botv2/img/plan17.jpeg",
 					"buttons":[
 						this.btnPostback("Cotizar", "btn_cotizar_7000")
-					]
-				},
-				{
-					"title":"Incluye 8000mb para navegar + Redes sociales, llamadas/msj sin limite + Equipo",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-					"buttons":[
-						this.btnPostback("Cotizar", "btn_cotizar_8000")
-					]
-				},//endTemplate
-				{
-					"title":"Incluye 9000mb para navegar + Redes sociales, llamadas/msj sin limite + Equipo",
-					"image_url":"https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
-					"buttons":[
-						this.btnPostback("Cotizar", "btn_cotizar_9000")
 					]
 				}
 			]//endElements
@@ -438,46 +443,73 @@ module.exports = class Microbot{
 			this.callSendAPI(template);
 
 		}
-		else if(payload === 'btn_taf' || payload === 'btn_credito_face'){
-			let btn;
-			if(payload === 'btn_taf'){
-				btn = this.btnPostback('Cotizar', 'btn_cotizar_taf');
-			}
-			else{
-				btn = this.btnPostback('Cotizar', 'btn_cotizar_face')
-			}
-
+		else if(payload === 'btn_taf'){
+			let btn = this.btnPostback('Cotizar', 'btn_cotizar_taf');
 			let elementos = [
         		{
-        			"title": "Estrena celular pagando desde el 15% de enganche y 12 pagos desde $192 mensuales",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Alcatel U5 Plus con tu Tarjeta Amigo Fácil",
+        			"subtitle": "Desde el 15% de enganche y 12 pagos de $192",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan4.jpeg",
         			"buttons": [
         				btn
         			]
         		},
         		{
-        			"title": "Estrena celular pagando desde el 15% de enganche y 12 pagos desde $192 mensuales",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Polaroid Turbo C4 Plus con tu Tarjeta Amigo Fácil",
+        			"subtitle": "Desde el 15% de enganche y 12 pagos de $120",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan15.jpeg",
         			"buttons": [
         				btn
         			]
-        		},{
-        			"title": "Estrena celular pagando desde el 15% de enganche y 12 pagos desde $192 mensuales",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        		},
+        		{
+        			"title": "Estrena un Xaomi Redmi 5 Plus con tu Tarjeta Amigo Fácil",
+        			"subtitle": "Desde el 15% de enganche y 12 pagos de $442",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan5.jpeg",
         			"buttons": [
         				btn
         			]
         		}
         	]
-        	let template = this.templateList(elementos);
+        	let template = this.templateGeneric(elementos);
         	this.actionBot('typing');
         	this.callSendAPI(template);
 		}
+		else if(payload === 'btn_credito_face' ){
+			let btn = this.btnPostback('Información', 'btn_cotizar_face')
+			let elementos = [
+        		{
+        			"title": "Estrena un Moto C 4g pagando desde el 15% de enganche",
+        			"subtitle": "Te autorizamos tu crédito con tu cuenta facebook",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan6.jpeg",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "Estrena un Moto G6 Play desde el 15% de enganche",
+        			"subtitle": "Te autorizamos tu crédito con tu cuenta facebook",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan13.jpeg",
+        			"buttons": [
+        				btn
+        			]
+        		},
+        		{
+        			"title": "Estrena un Samsung J7 Pro desde el 15% de enganche",
+        			"subtitle": "Te autorizamos tu crédito con tu cuenta facebook",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan12.jpeg",
+        			"buttons": [
+        				btn
+        			]
+        		}
+        	]
+        	let template = this.templateGeneric(elementos);
+        	this.actionBot('typing');
+        	this.callSendAPI(template);
+
+		}
 		else if(payload === 'btn_cotizar_taf' ){
-			let response = `Para tramitar tu crédito solo es necesario una identificación oficial vigente y un comprobante domiciliario, deberás acudir a tu sucursal MicroTec más cercana para realizar el trámite. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`
+			let response = `Para tramitar tu crédito solo es necesario una identificación oficial vigente y un comprobante domiciliario, deberás acudir a tu sucursal MicroTec más cercana para realizar el trámite. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(response, boton);
 
@@ -486,52 +518,53 @@ module.exports = class Microbot{
 			this.actionBot('typing');
 			this.callSendAPI(template);
 			this.callSendAPI(menu);
+
 		}
 		else if(payload === 'btn_cotizar_face'){
-			let texto = `Para tramitar tu crédito con tu cuenta de facebook solo es necesario una identificación oficial vigente, un número celular activo y tu cuenta activa de Facebook, deberás acudir a tu sucursal MicroTec más cercana para realizar el trámite. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let texto = `Para tramitar tu crédito con tu cuenta de facebook solo es necesario una identificación oficial vigente, un número celular activo y tu cuenta activa de Facebook, deberás acudir a tu sucursal MicroTec más cercana para realizar el trámite. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
 			let menu = this.templateBtn("Si deseas volver a ver mi menu de opciones, puedes hacerlo!!", [this.btnPostback('Menu', 'empezar')]);
 			
 			this.actionBot('typing');
-			this.callSendAPI(template);
 			this.callSendAPI(menu);
+			this.callSendAPI(template);
 		}
 		else if(payload === 'btn_promo_contado'){
-			let btn = this.btnPostback('Cotizar', 'btn_cotizar_promo_contado');
+			let btn = this.btnPostback('Comprar', 'btn_cotizar_promo_contado');
 			let elementos = [
 				{
-        			"title": "$1,999 tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Nokia N3",
+        			"subtitle": "Pantalla 5\" - Cámara 8 Mp - Memoria 8 Gb",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan8.jpeg",
         			"buttons": [
         				btn
         			]
         		},
         		{
-        			"title": "$999 tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Oale X5",
+        			"subtitle": "Pantalla 6\" - Cámara 13 Mp - Memoria 16 Gb",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan18.jpeg",
         			"buttons": [
         				btn
         			]
         		},
         		{
-        			"title": "$599 tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un RT Shock 5",
+        			"subtitle": "Pantalla 5\" - Cámara 5 Mp - Memoria 8 Gb",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan19.jpeg",
         			"buttons": [
         				btn
         			]
         		}
 			];
-			let template = this.templateList(elementos);
+			let template = this.templateGeneric(elementos);
 			this.actionBot('typing');
 			this.callSendAPI(template);
 		}
 		else if(payload === 'btn_cotizar_promo_contado'){
-			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
@@ -542,39 +575,39 @@ module.exports = class Microbot{
 			this.callSendAPI(menu);
 		}
 		else if(payload === 'btn_promo_apartado'){
-			let btn = this.btnPostback('Cotizar', 'btn_cotizar_promo_apartado');
+			let btn = this.btnPostback('Información', 'btn_cotizar_promo_apartado');
 			let elementos = [
 				{
-        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Huawei Y5 Pro en Microtec",
+        			"subtitle": "Puedes apártarlo desde $50 pesos",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan20.jpeg",
         			"buttons": [
         				btn
         			]
         		},
         		{
-        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un Lanix ilium en Microtec",
+        			"subtitle": "Puedes apártarlo desde $50 pesos",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan23.jpeg",
         			"buttons": [
         				btn
         			]
         		},
         		{
-        			"title": "$599 apartalo desde $50 pesos tenemos una gran variedad de marcas y modelos",
-        			//"subtitle": "subtitulo con 80 caracteres",
-        			"image_url": "https://i1.wp.com/wp.micro-tec.com.mx/wp-content/uploads/2017/11/cropped-microtec-2-1.png",
+        			"title": "Estrena un LG K8 en Microtec",
+        			"subtitle": "Puedes apártarlo desde $50 pesos",
+        			"image_url": "https://www.micro-tec.com.mx/pagina/botv2/img/plan21.jpeg",
         			"buttons": [
         				btn
         			]
-        		}
+        		},
 			];
-			let template = this.templateList(elementos);
+			let template = this.templateGeneric(elementos);
 			this.actionBot('typing');
 			this.callSendAPI(template);
 		}
 		else if(payload === 'btn_cotizar_promo_apartado'){
-			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Apártalo con $50 pesos o más y termínalo de pagar hasta en 3 meses. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let texto = `En Microtec podrás encontrar una gran variedad de marcas y modelos para que te lleves el celular de tus sueños o tengas el regalo perfecto. Apártalo con $50 pesos. Encuentra tu tienda más cercana para ver nuestros celulares y accesorios. Recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
@@ -586,11 +619,11 @@ module.exports = class Microbot{
 		}
 		else if (payload === 'btn_internet_199') {
 			let texto = `En Microtec podrás encontrar el nuevo internet en casa, que te ofrece internet ilimitado con renta mensual de $199 y velocidad de 5 Mbps.
-- ubicas el lugar donde va estar 
-- conectas el modem a la corriente 
-- y disfruta de internet ilimitado en tus dispositivos 
+✅ ubica el lugar donde va estar
+✅ conectas el modem a la corriente 
+✅ y disfruta de internet ilimitado en tus dispositivos 
 Encuentra tu tienda más cercana para realizar el trámite, solo con una identificación oficial vigente y un comprobante de domicilio.  
-Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
@@ -602,11 +635,11 @@ Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cober
 		}
 		else if (payload === 'btn_internet_349') {
 			let texto = `En Microtec podrás encontrar el nuevo internet en casa, que te ofrece internet ilimitado con renta mensual de $349 y velocidad de 10 Mbps. 
-- ubicas el lugar donde va estar 
-- conectas el modem a la corriente 
-- y disfruta de internet ilimitado en tus dispositivos 
+✅ ubicas el lugar donde va estar 
+✅ conectas el modem a la corriente 
+✅ y disfruta de internet ilimitado en tus dispositivos 
 Encuentra tu tienda más cercana para realizar el trámite, solo con una identificación oficial vigente y un comprobante de domicilio. 
-Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
@@ -617,7 +650,7 @@ Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cober
 			this.callSendAPI(menu);
 		}
 		else if( payload === 'btn_ubica_sucursal' ){
-			let texto = `Encuentra tu tienda más cercana contamos con gran variedad de equipos y modelos, además tenemos los accesorios que tu necesitas para tu celular, recarga tiempo aire y paga tus servicios. Ubicar tu tienda, contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca`;
+			let texto = `Encuentra tu tienda más cercana contamos con gran variedad de equipos y modelos, además tenemos los accesorios que tu necesitas para tu celular, recarga tiempo aire y paga tus servicios. Ubicar tu tienda, contamos con cobertura en Puebla, Veracruz, Tlaxcala y Oaxaca 📍`;
 			let boton = [this.btnUrl('Tiendas Microtec 📎', 'https://www.micro-tec.com.mx/pagina/microtec/sucursales.html')];
 			let template = this.templateBtn(texto, boton);
 
@@ -628,7 +661,7 @@ Ubicar tu tienda a traves de nuestro portal web, recuerda que contamos con cober
 			this.callSendAPI(menu);
 		}
 		else if( payload === 'btn_agente_live' ){
-			let texto = `Excelente con gusto podemos ayudarte, dinos ¿Cuál es tu duda? o ¿Qué servicio buscas? Y en breve uno de nuestros asesores te contestará`;
+			let texto = `Excelente con gusto podemos ayudarte, dinos ¿Cuál es tu duda? o ¿Qué servicio buscas? Y en breve uno de nuestros asesores te contestará 👤`;
 			this.actionBot('typing');
 			this.callSendAPI({text: texto});
 			this.passThreadControl();
