@@ -1,12 +1,27 @@
 var express = require("express");
+var https = require("https");
+var http = require("http");
+var fs = require("fs");
 var bodyParser = require("body-parser");
 var Microbot = require('./Microbot.js');
 
+/*
+var sslOptions = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+*/
+
 var app = express();
 app.use(bodyParser.json());
+/*
 app.listen(3000, function(){
 	console.log("el servidor esta corriendo en el puerto 3000");
 });
+*/
+
+//https.createServer(sslOptions, app).listen(3000);
+http.createServer(app).listen(3000);
 
 app.get('/webhook', function(req, res){
 	let mode = req.query['hub.mode'];
@@ -20,6 +35,9 @@ app.get('/webhook', function(req, res){
 		else{
 			res.sendStatus(403);
 		}
+	}
+	else{
+		res.sendStatus(404);
 	}
 });
 

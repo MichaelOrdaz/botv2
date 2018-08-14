@@ -5,7 +5,7 @@ module.exports = class Microbot{
 
 	constructor(senderId){
 		this.senderId = senderId;
-		this.APP_TOKEN = "EAAW1N706mu0BABLBlDunN5YFWeq6mNHVXywPiZBQitdBNI3VTj5KvF82yI3THBsLCS9ZCAvaGNac5zsc6yff71ZAkAZCpQWRZAWMcf16ZArwPewq8vmfyoVm7z4ZApGEtwc6CGr81ix657tdzq9lHyofZCHPHnzZCPav0YXPgi7ZBChHZAC8gqCsV7P";
+		this.APP_TOKEN = "EAAW1N706mu0BAMKzjSCCn6XEULFTWGaJP121ZCVxp3SupRu0SfWem0f4icuhNPsOyK5Uc7g58LJcWhcArezbKEclNZCZCwi9nEBTpomVKwuVkXcdWFHzZBpJ1d6oZAsVfdMrVcwry4hSziNQncdG773MsGVXraxp8wR1iTXw1lkmBB61LWXnE";
 	}
 
 	firstEntity(nlp, name){
